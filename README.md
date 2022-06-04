@@ -1,4 +1,4 @@
-# Redacción de documentos académicos coon R
+# Redacción de documentos académicos con R
 
 Este repositorio servirá para almacenar el material del curso Redacción de documentos académicos con R:
 
