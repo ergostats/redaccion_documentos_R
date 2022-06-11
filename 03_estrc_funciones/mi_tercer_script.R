@@ -32,11 +32,21 @@ hist(peso)
 
 # Metiendose adentro de mean:
 
+# Vector peso:
 sum(peso,na.rm = T)/length(peso) # Hay mas elementos por la presencia de NA
 
-tamano_sin_na <- peso[!is.na(peso)]
+peso_sin_na <- peso[!is.na(peso)]
+
+sum(peso,na.rm = T)/length(peso_sin_na)
+
+
+# Altura:
+
+tamano_sin_na <- altura[!is.na(altura)]
 
 sum(altura,na.rm = T)/length(tamano_sin_na)
+
+mean(altura,na.rm = T)
 
 # Saber cuantos valores completos
 
@@ -58,11 +68,10 @@ completos <- length(peso_sin_na)
 paste("el vector tiene", todos, "elementos y",completos,"no son NA",sep = " ")
 
 
-#
-
 # Mejor creo una función!!!! ----------------------------------------------
 
-valores_completos <- function(tabla,variable){
+valores_completos <- function(tabla,
+                              variable){
   
   # Extraer el vector de la variable
   
@@ -86,7 +95,26 @@ valores_completos <- function(tabla,variable){
   return(mensaje)
 }
 
+rm(list = ls())
+
+
+# Otra vez estoy copiando y pegando el codigo con el cambio de la variable
+
 valores_completos(tabla = starwars,variable = "mass")
 valores_completos(tabla = starwars,variable = "height")
 valores_completos(tabla = starwars,variable = "sex")
 valores_completos(tabla = starwars,variable = "birth_year")
+
+
+# Pero el R tiene los loops!!
+
+variables <- c("mass","height","sex","birth_year")
+
+
+for (i in variables) {
+  
+  msm <- valores_completos(tabla = starwars,variable = i)
+  
+  print(msm)
+  
+}
