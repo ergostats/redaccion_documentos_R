@@ -7,7 +7,11 @@
 
 help.start() 
 
+# Buscar ayuda de un modelo lineal
+
 help.search("linear model")
+
+# verificar la versión de R
 
 R.version
 
@@ -15,6 +19,8 @@ R.version
 # en años enteros
 
 edades <- c(54,23,17,90) # Aqui está mal definido el tipo de vector
+
+# Clase del vector edades
 
 class(edades)
 
