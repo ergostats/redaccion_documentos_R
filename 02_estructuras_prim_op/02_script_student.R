@@ -18,7 +18,7 @@
 # R como calculadora ------------------------------------------------------
 
 # Ejercicio 2:
-# 1.Crear 2 vectores numericos con 6 elementos
+# 1.Crear 2 vectores numéricos con 60 elementos usando la función sample
 # 2. Sumar los dos vectores
 # 3. Restar los dos vectores
 # 4. Multiplicar los dos vectores
@@ -37,8 +37,10 @@
 # Operadores lógicos ------------------------------------------------------
 
 # Ejercicio 4:
-# 1. Filtrar el primer vector usando el operador lógico: >=
-# 2. Filtrar el segundo vector usando dos operadores lógicos: >= <=
+# 1. Filtrar el primer vector para aquellos elementos superiores o iguales
+# a la mediana, usando el operador lógico: >=
+# 2. Filtrar el segundo vector para aquellos elementos  usando dos operadores lógicos: < 
+# Los elementos que estan entre el quartil 25 y 75
 
 
 # Fechas ------------------------------------------------------------------
