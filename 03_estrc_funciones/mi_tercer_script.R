@@ -118,3 +118,304 @@ for (i in variables) {
   print(msm)
   
 }
+
+
+# Condicional:
+
+class(starwars$name)
+
+class(starwars$mass)
+
+is.numeric(starwars$mass)
+
+is.numeric(starwars$name)
+
+
+# Loop sobre todas las columnas de un dataframe
+
+for(i in names(starwars)){
+  
+  variable <- starwars[[i]]
+  
+  msm <- paste("la variable",i,"es un",class(variable))
+  
+  print(msm)
+  
+}
+
+# Condicionales:
+
+vector <- starwars$starships
+vector <- starwars$height
+
+class(starwars$starships)
+
+
+# Condicional simple:
+
+if(is.numeric(vector)){
+  
+  msm <- paste("la media es",mean(vector,na.rm = T),sep = " ")
+  
+  print(msm)
+}
+
+for(i in names(starwars)){
+  
+  vector <- starwars[[i]]
+  
+  if(is.numeric(vector)){
+    
+    msm <- paste("la media de la variable",i,"es",mean(vector,na.rm = T),sep = " ")
+    
+    print(msm)
+  }
+  
+}
+
+# Condicional con alternativa general
+
+
+if(is.numeric(vector)){
+  
+  msm <- paste("la media es",mean(vector,na.rm = T),sep = " ")
+  
+}else{
+  
+  msm <- paste("la variable",i,"es un",class(variable))
+}
+
+# Condicional con alternativas especificas
+
+vector <- starwars$hair_color
+
+unique(vector)
+
+if(is.numeric(vector)){
+  
+  msm <- paste("la media es",mean(vector,na.rm = T),sep = " ")
+  
+}else if(is.character(vector)){
+  
+  unicos <- unique(vector)
+  
+  msm <- paste("la variable",i,"tiene",length(unicos),"unicos",sep = " ")
+}
+
+print(msm)
+
+# Juntando todo, o armando el megazord
+
+for(i in names(starwars)){
+  
+  vector <- starwars[[i]]
+  
+  if(is.numeric(vector)){
+    
+    msm <- paste("la media de la variable",i,"es",mean(vector,na.rm = T),sep = " ")
+    
+  }else if(is.character(vector)){
+    
+    unicos <- unique(vector)
+    
+    msm <- paste("la variable",i,"tiene",length(unicos),"unicos",sep = " ")
+  }
+  
+    print(msm)
+}
+
+
+# replicar ese gran proceso para otra tabla
+
+tabla <- iris
+
+tabla <- starwars
+
+for(i in names(tabla)){
+  
+  vector <- tabla[[i]]
+  
+  if(is.numeric(vector)){
+    
+    msm <- paste("la media de la variable",i,"es",mean(vector,na.rm = T),sep = " ")
+    
+  }else if(is.character(vector)){
+    
+    unicos <- unique(vector)
+    
+    msm <- paste("la variable",i,"tiene",length(unicos),"unicos",sep = " ")
+  }else{
+    
+    msm <- paste("la variable",i,"es un",class(variable))
+    
+  }
+  
+  print(msm)
+}
+
+
+# Creando un data frame de resumen con un loop
+
+tabla <- starwars
+
+resumen_tabla <- data.frame(
+  var = NA,
+  n_elementos = NA,
+  completos = NA,
+  clase = NA,
+  media = NA,
+  unicos = NA
+)
+
+
+# ejemplo basico:
+
+vector <- 0
+
+for(i in 1:10){
+  
+  vector <- c(vector, i)
+  
+  print(vector)
+}
+
+for(variable in names(tabla)){
+  # Extraer el vector de la variable
+  
+  resumen <- data.frame(var = variable)
+  
+  vector <- tabla[[variable]]
+  
+  # Calcular el tamaño
+  
+  todos <- length(vector)
+  
+  resumen$n_elementos <-  todos
+  
+  # Ver los completos
+  
+  vector_sin_na <- vector[!is.na(vector)]
+  
+  completos <- length(vector_sin_na)
+  
+  resumen$completos <-  completos
+  
+  # el tipo de variable
+  
+  resumen$clase <- class( vector)
+  
+  
+  # Creacion de la columna media con un condicional
+  
+  if(is.numeric(vector)){
+    
+    resumen$media <- mean(vector,na.rm = T)
+    
+  }else{
+    
+    resumen$media <- NA
+  } 
+  
+  
+  if(is.character(vector)){
+    
+    unicos <- unique(vector)
+    
+    resumen$unicos  <- length(unicos)
+    
+  }else{
+    
+    resumen$unicos <- NA
+    
+  }
+  
+  # juntar el resumen de todas las variables
+  
+  resumen_tabla <- rbind(resumen_tabla,resumen)
+  
+  
+}
+
+  print(resumen_tabla)
+  print(resumen_tabla)
+# Versioon 2.0 ------------------------------------------------------------
+
+
+resumen_variables <- function(tabla){
+  
+  resumen_tabla <- data.frame(
+    var = NA,
+    n_elementos = NA,
+    completos = NA,
+    clase = NA,
+    media = NA,
+    unicos = NA
+  )
+  
+  for(variable in names(tabla)){
+    # Extraer el vector de la variable
+    
+    resumen <- data.frame(var = variable)
+    
+    vector <- tabla[[variable]]
+    
+    # Calcular el tamaño
+    
+    todos <- length(vector)
+    
+    resumen$n_elementos <-  todos
+    
+    # Ver los completos
+    
+    vector_sin_na <- vector[!is.na(vector)]
+    
+    completos <- length(vector_sin_na)
+    
+    resumen$completos <-  completos
+    
+    # el tipo de variable
+    
+    resumen$clase <- class( vector)
+    
+    
+    # Creacion de la columna media con un condicional
+    
+    if(is.numeric(vector)){
+      
+      resumen$media <- mean(vector,na.rm = T)
+      
+    }else{
+      
+      resumen$media <- NA
+    } 
+    
+    
+    if(is.character(vector)){
+      
+      unicos <- unique(vector)
+      
+      resumen$unicos  <- length(unicos)
+      
+    }else{
+      
+      resumen$unicos <- NA
+      
+    }
+    
+    # juntar el resumen de todas las variables
+    
+    resumen_tabla <- rbind(resumen_tabla,resumen)
+    
+    
+  }
+  
+  return(resumen_tabla)
+}
+
+  
+  resumen_variables(iris)
+  
+  resumen_variables(starwars)
+
+  resumen_variables(mtcars)
+  
