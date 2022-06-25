@@ -30,20 +30,31 @@ str(identificacion)
 
     # Crear carpeta de datos:
 
-  
-  "04_caso_estudio/datos/"
+if(!dir.exists( "04_mi_primer_rmd/datos/")){
+  dir.create( "04_mi_primer_rmd/datos/")
+}
   
 
     # Crear la carpeta: Diccionarios:
-  
-  "04_caso_estudio/diccionarios/"
+  if(!dir.exists( "04_mi_primer_rmd/diccionarios/")){
+    dir.create( "04_mi_primer_rmd/diccionarios/")
+  }
+ 
 
 # Descargar la base de datos ----------------------------------------------
   # Enlace: 
-  "https://www.ecuadorencifras.gob.ec/documentos/web-inec/EMPLEO/2019/Diciembre/BDD_ENEMDU_2019_12_CSV%20%28DATOS%20ABIERTOS%29.zip"
+
+enemdu_file <- "04_mi_primer_rmd/enemdu_2019_12.zip"
+
+
+if(!file.exists(enemdu_file)){
+  download.file(url = "https://www.ecuadorencifras.gob.ec/documentos/web-inec/EMPLEO/2019/Diciembre/BDD_ENEMDU_2019_12_CSV%20%28DATOS%20ABIERTOS%29.zip",
+                destfile = enemdu_file)
+}
+
+
 
   # Archvivo:
-  enemdu_file <- "04_caso_estudio/enemdu_2019_12.zip"
                 
 
 
