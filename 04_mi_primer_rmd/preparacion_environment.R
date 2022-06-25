@@ -30,21 +30,21 @@ str(identificacion)
 
     # Crear carpeta de datos:
 
-if(!dir.exists( "04_mi_primer_rmd/datos/")){
-  dir.create( "04_mi_primer_rmd/datos/")
+if(!dir.exists( "datos/")){
+  dir.create( "datos/")
 }
   
 
     # Crear la carpeta: Diccionarios:
-  if(!dir.exists( "04_mi_primer_rmd/diccionarios/")){
-    dir.create( "04_mi_primer_rmd/diccionarios/")
+  if(!dir.exists( "diccionarios/")){
+    dir.create( "diccionarios/")
   }
  
 
 # Descargar la base de datos ----------------------------------------------
   # Enlace: 
 
-enemdu_file <- "04_mi_primer_rmd/enemdu_2019_12.zip"
+enemdu_file <- "enemdu_2019_12.zip"
 
 
 if(!file.exists(enemdu_file)){
@@ -69,7 +69,7 @@ unzip(zipfile = enemdu_file,
 
 # Crear directorio: datos
 file.copy(from = "enemdu_viv_hog_201912.csv",
-          to = "04_mi_primer_rmd/datos/enemdu_viv_hog_201912.csv")
+          to = "datos/enemdu_viv_hog_201912.csv")
 
 # Diccionarios ------------------------------------------------------------
 
@@ -77,18 +77,18 @@ file.copy(from = "enemdu_viv_hog_201912.csv",
 
 unzip(zipfile = enemdu_file,
       files = "DICCIONARIO_VARIABLES.zip",
-      exdir = "04_mi_primer_rmd/diccionarios")
+      exdir = "diccionarios")
 
-unzip(zipfile = "04_mi_primer_rmd/diccionarios/DICCIONARIO_VARIABLES.zip",
+unzip(zipfile = "diccionarios/DICCIONARIO_VARIABLES.zip",
       files = "enemdu_personas_2019_12.xlsx",
-      exdir = "04_mi_primer_rmd/diccionarios")
+      exdir = "diccionarios")
 
 
 
 # Eliminar archivos -------------------------------------------------------
 file.remove(c("enemdu_viv_hog_201912.csv",
-              "04_mi_primer_rmd/enemdu_2019_12.zip",
-              "04_mi_primer_rmd/diccionarios/DICCIONARIO_VARIABLES.zip"))
+              "enemdu_2019_12.zip",
+              "diccionarios/DICCIONARIO_VARIABLES.zip"))
 
 
 
