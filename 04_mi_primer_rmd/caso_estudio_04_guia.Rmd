@@ -1,0 +1,494 @@
+---
+title: "Redacción de artículos académicos con R"
+subtitle: "Brecha salarial por sexo"
+author:
+- Bajaña Alex
+- Chanatásig Evelyn
+- Heredia Aracely
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+bibliography: bibliografia.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE
+)
+# Instalar el paquete "radxl" 
+if(!"readxl" %in% installed.packages()[,1]){
+  install.packages("readxl")
+}
+
+if(!"datapasta" %in% installed.packages()[,1]){
+  install.packages("datapasta")
+}
+
+if(!"tidyverse" %in% installed.packages()[,1]){
+  install.packages("tidyverse")
+}
+
+if(!"flextable" %in% installed.packages()[,1]){
+  install.packages("flextable")
+}
+
+if(!"psych" %in% installed.packages()[,1]){
+  install.packages("psych")
+}
+
+if(!"tinytex" %in% installed.packages()[,1]){
+  install.packages("tinytex")
+}
+
+library(tidyverse)
+library(readxl)
+library(flextable)
+library(datapasta)
+library(psych)
+
+```
+
+# Marco Teórico
+
+Ha habido muchos avances en el cierre de la brecha salarial, que se redujo sustancialmente en las décadas de 1970 y 1980, sin embargo este progreso se desaceleró sustancialmente a partir de la década de 1990, de hecho, el avance parece haberse estancado desde esta década.
+
+Una pequeña parte de la brecha salarial de género sigue sin explicarse. Con la finalidad de explicar esta porción persistentemente enigmática, muchos académicos están buscando alternativas para estudiar dónde y cuándo surgen las desigualdades, especialmente mirando los valores prelaborales, es así como @casiYase analizó experiencias laborales muy tempranas para comprender cómo los niños y las niñas aprenden a hacer género.
+
+Una teoría sostenía que a las mujeres se les pagaba menos que a los hombres porque no tenían la misma educación, no tenían tantos títulos avanzados o tenían tasas de graduación más bajas. Si bien esto pudo haber sido cierto en décadas anteriores, hoy en día las mujeres superan en número a los hombres en asistencia universitaria y graduación. A pesar de los importantes avances educativos, la brecha salarial persiste.
+
+El enfoque del capital humano también sostiene que la desigualdad salarial se debe a diferencias en la experiencia. Este enfoque es menos convincente de lo que podría haber sido antes, ya que las mujeres han logrado un progreso sustancial en el aumento de su experiencia laboral (@bose), sin embargo, incluso hoy en día, sigue existiendo un sesgo en contra de las madres con niños pequeños que trabajan a tiempo completo (@Treas) pues, la sociedad espera que las mujeres participen en todas las actividades y se ocupen de la vida cotidiana de sus hijos en lugar de delegar (@Epstein; @Stone).
+
+El siguiente enfoque es la segregación ocupacional. Esta sostiene que la brecha salarial no se explica a través de las características individuales, sino a través de factores ocupacionales. Esto significa que a hombres y mujeres no se les paga de la misma manera porque realizan diferentes trabajos (@Gottfried). Esta situación se ha visto modificada a través de las décadas porque existen muchas mujeres que ingresan a ocupaciones tradicionalmente masculinas (@Reskin86;@Reskin02), sin embargo, pocos hombres han ingresado a trabajos de mujeres. Varios estudios han confirmado que la segregación por sexo tiene efectos negativos muy fuertes sobre los salarios (@England00; @Tomaskovic02).
+
+El proposito de este articulo es medir o cuantificar en Ecuador la brecha de genero tomando como evidencia los resultados de la ENEMDU.
+
+# Brecha salarial por sexo
+
+## Lectura de la base
+
+```{r, echo=FALSE, include = TRUE}
+# Insertar chunk con ctrl+alt+I
+
+path <- "datos/enemdu_persona_201912.csv"
+
+# Primeras tres lineas
+
+read_lines(file = path,n_max = 10)
+
+enemdu <- read_delim(file = path, #  Nombre del archivo
+                     delim = ";" # Separador
+) 
+
+dimensiones <- dim(enemdu)
+
+spec(enemdu)
+
+# names(enemdu)
+```
+
+La tabla enemdu tiene `r dimensiones[1]` filas y `r dimensiones[2]` columnas.
+
+## Lectura del diccionario
+
+```{r}
+list.files("diccionarios/",full.names = T)
+
+
+dicc_path <- "diccionarios/enemdu_personas_2019_12.xlsx"
+
+hojas <- excel_sheets(dicc_path)
+
+# Rango: "C15:G170"
+
+hoja_1 <- read_excel(path = dicc_path,
+                     sheet = "Diccionario de variables",
+                     range = "C15:G170" )
+
+hoja_2 <- read_excel(path = dicc_path,
+                     sheet = "Definición de campos",
+                     range = "B7:C11" )
+
+variables <- c(sexo = "p02",
+               edad = "p03",
+               a_trabajo = "p45",
+               nivel_inst = "p10a",
+               h_trabajo = "p51a",
+               ingresos = "p66")
+
+# Introducción al filter:
+
+diccionario <- hoja_1[hoja_1$`CODIGO DE LA VARIABLE` %in% variables, ]
+
+# Con tidyverse:
+
+names(diccionario)
+
+diccionario <- filter(.data = hoja_1, # Nuestra tabla de datos
+       `CODIGO DE LA VARIABLE` %in% variables
+       )
+
+
+flextable(diccionario)
+
+```
+
+## Sacar las columnas de la base
+
+```{r,echo=FALSE}
+
+# Introducción al select:
+
+enemdu_0 <- enemdu[ ,variables]
+
+# Con tidyverse:
+
+enemdu <- select(.data = enemdu,variables)
+
+# Equivale a y es mejor si lo escribimos asi:
+
+# select(.data = enemdu,all_of(variables))
+
+head(enemdu)
+
+# Navego en la lista de tipos de objeto en la base de datos:
+
+glimpse(enemdu)
+
+
+```
+
+Diccionarios de variables:
+
+> [ANDA Inec](https://anda.inec.gob.ec/anda/index.php/catalog/269/data_dictionary)
+
+```{r, include=FALSE}
+# Con `datapasta`
+# Ctrl+c de la tabla (tiene que ser una tabla)
+
+# # Ejemplo datapasta:
+
+tibble::tribble(
+       ~Valor,      ~Categoría, ~Weighted,
+          "1",     "Casado(a)",  3904106L,
+          "2",   "Separado(a)",   669792L,
+          "3", "Divorciado(a)",   213858L,
+          "4",      "Viudo(a)",   600545L,
+          "5",   "Uniòn libre",  1815204L,
+          "6",    "Soltero(a)",  4215784L,
+    "Sysmiss",              NA,  3058839L
+    )
+
+
+data.frame(
+  stringsAsFactors = FALSE,
+         Selección = c("Bandera de Dinamarca Dinamarca","Bandera de Senegal Senegal",
+                       "Bandera de Uruguay Uruguay","Bandera de Francia Francia"),
+              Pts. = c(7L, 5L, 2L, 1L),
+                PJ = c(3L, 3L, 3L, 3L),
+                PG = c(2L, 1L, 0L, 0L),
+                PE = c(1L, 2L, 2L, 1L),
+                PP = c(0L, 0L, 1L, 2L),
+                GF = c(5L, 5L, 4L, 0L),
+                GC = c(2L, 4L, 5L, 3L),
+              Dif. = c(3L, 1L, -1L, -3L)
+)
+
+# 
+
+# # Y te vas al boton addins y das PAste as Tribble:
+# 
+
+
+# Paste as data.frame:
+niv_inst <- data.frame(
+  stringsAsFactors = FALSE,
+             Valor = c("1","2","3","4","5","6",
+                       "7","8","9","10","Sysmiss"),
+         Categoria = c("Ninguno",
+                       "Centro de alfabetización","Jardín de infantes","Primaria",
+                       "Educación básica","Secundaria","Educación media",
+                       "Superior no universitaria","Superior universitaria","Post-grado",NA),
+          Weighted = c(744495L,46095L,0L,3490529L,
+                       3362979L,2908802L,832464L,75651L,1795873L,55783L,
+                       1165459L)
+)
+
+
+
+# Paste as vector:
+
+sexo <- data.frame(
+  stringsAsFactors = FALSE,
+       check.names = FALSE,
+             Valor = c(1L, 2L),
+      Categoria = c("Hombre", "Mujer"),
+          Weighted = c(7078625L, 7399504L)
+)
+
+```
+
+### Diccionario: Sexo
+
+```{r}
+flextable(sexo)
+```
+
+### Diccionario: Nivel de instrucción
+
+```{r}
+flextable(niv_inst)
+```
+
+# Análisis exploratorio
+
+Usando la función `describe` queremos generar un resumen para la base de datos:
+
+```{r, echo=TRUE}
+
+# Renombrar con R base:
+
+names(enemdu) <- names(variables)
+
+# Rename con tidyverse:
+# 
+# enemdu <- rename(.data = enemdu,
+#        sexo = p02,
+#        edad = p03,
+#        a_trabajo = p45,
+#        nivel_inst = p10a,
+#        h_trabajo = p51a,
+#        ingresos = p66)
+
+
+resumen <- psych::describe(enemdu)
+
+attributes(resumen)
+
+tabla_temp <- resumen[, c("vars","n","mean","sd","min","max")]
+
+tabla_temp <- select(resumen,c("vars","n","mean","sd","min","max"))
+
+variable <- data.frame(Variable = rownames(resumen))
+
+temporal_2 <- flextable(cbind(variable,tabla_temp))
+
+autofit(temporal_2)
+```
+
+# Errores en la base:
+
+-   Sexo no es una variable una variable numérica
+-   nivel de instrucción no es una variable una variable numérica
+-   En edad 99 es "No informa" le asignamos como vacio
+-   En ingresos 999999 es "No informa" le asignamos como vacio
+
+# Soluciones
+
+-   Sexo y nivel de instrucción convertir a factor
+-   En ingresos y edad crear un condicional
+
+## Corrección de sexo:
+
+
+```{r}
+# Crear un chink ctrl + alt + I
+
+table(enemdu$sexo)
+
+sexo
+
+enem_sexo <- factor(enemdu$sexo)
+
+  levels(enem_sexo)
+
+  # Transformo a factor mi variable sexo:
+  
+  # Utilizando el diccionario y la función levels()
+  enemdu$sexo <- factor(x = enem_sexo,
+                        levels = levels(enem_sexo), # Los levels  y 
+                        labels = sexo$Categoria)    # las labels deben de igual tamaño
+  
+  # Esto es equivalente a hacer esto a mano:
+    enemdu$sexo <- factor(x = enem_sexo,
+                        levels = c("1",     "2"), # Los levels  y 
+                        labels = c("Hombre","Mujer")) 
+
+levels(enemdu$sexo)
+head(enemdu)
+```
+
+## Corrección de nivel de instrucción:
+
+```{r}
+enem_nivel_inst <- factor(enemdu$nivel_inst)
+
+  levels(enem_nivel_inst)
+
+  # hay un vacio en la tabla de nivel de instruccion
+  
+  # en la base no hay categoria igual a 3:
+  niv_inst <- niv_inst[niv_inst$Valor != "3", ]
+  
+  nivs <- na.omit(niv_inst$Categoria)
+  
+  
+  
+  # Transformo a factor mi variable sexo:
+enemdu$nivel_inst <- factor(x = enem_nivel_inst,
+       levels = c(" ", "1"  , "2",  "4",  "5",  "6",  "7",  "8",  "9" ,"10"),
+       labels = c("Vacio","Ninguno","Centro de alfabetización",
+                  "Primaria","Educación básica","Secundaria","Educación media",
+                  "Superior no universitaria","Superior universitaria","Post-grado"))
+
+
+tabla_temp <- head(enemdu)
+
+flextable(tabla_temp)
+
+plot(enem_nivel_inst)
+plot(enemdu$nivel_inst)
+
+```
+
+
+## Corregir edades:
+
+```{r}
+# which indica las posiciones que cumplen una condición:
+
+posiciones_vacias <- which(enemdu$edad == 99L)
+
+enemdu$edad[posiciones_vacias] <- NA_integer_
+
+```
+
+
+## Corregir ingresos:
+
+```{r}
+# which indica las posiciones que cumplen una condición:
+
+
+enemdu$ingresos <- as.numeric(enemdu$ingresos)
+
+enemdu$a_trabajo <- as.numeric(enemdu$a_trabajo)
+
+enemdu$h_trabajo <- as.numeric(enemdu$h_trabajo)
+
+sum(enemdu$ingresos,na.rm = T)
+mean(enemdu$ingresos,na.rm = T)
+
+posiciones_vacias <- which(enemdu$ingresos == 999999L)
+
+enemdu$ingresos[posiciones_vacias] <- NA_integer_
+
+mean(enemdu$ingresos,na.rm = T)
+
+```
+
+# Separar por hombre y mujer:
+
+Ejemplo filter:
+
+```{r}
+hombres <- filter(.data = enemdu,sexo == "Hombre")
+mujeres <- filter(.data = enemdu,sexo != "Hombre")
+```
+
+
+# Modelo:
+
+#### comando `lm`
+
+-   El signo `~` indica los lados de la ecuación
+-   Al lado izquierdo ponemos la variable que queremos explicar (en este caso los ingresos)
+-   Del lado derecho definimos los regresores o variables explicativos o variables independientes
+-   Declarando un set de datos
+
+Primero veo la regresión para los hombres:
+
+```{r}
+modelo <- lm(formula = ingresos ~  h_trabajo + nivel_inst + a_trabajo + edad ,
+             data = hombres)
+
+summary(modelo)
+
+tabla_mod <- broom::tidy(modelo, conf.int=TRUE)
+
+for(i in 2:7){
+  tabla_mod[,i] <- round(tabla_mod[[i]],3)
+}
+
+ind <- tabla_mod$p.value< 0.05
+
+tabla_mod$p.value[ind] <- paste(tabla_mod$p.value[ind],"***")
+
+tabla_mod <- tabla_mod[,-3]
+
+names(tabla_mod) <- c("Parámetro", "Valor estimado", "Valor Z", "P-valor", "Límite inferior", "Límite superior")
+
+tabla_mod <- flextable(tabla_mod)
+
+autofit(tabla_mod)
+
+```
+
+Segundo veo la regresión para las mujeres:
+
+```{r}
+modelo_2 <- lm(formula = ingresos ~ h_trabajo + nivel_inst + a_trabajo + edad + h_trabajo,data = mujeres)
+
+#modelo_2
+
+#summary(modelo_2)
+
+tabla_mujeres <- broom::tidy(modelo_2, conf.int=TRUE)
+
+lista_modelo_muj <- lapply(tabla_mujeres,
+       FUN = function(columna){
+         if(is.numeric(columna)){
+           round(columna,3)
+         }else {columna}
+       })
+
+modelo_muj <- as.data.frame(lista_modelo_muj)
+
+indi <- modelo_muj$p.value < 0.05
+
+modelo_muj$p.value[indi] <- paste(modelo_muj$p.value[indi],"***")
+
+modelo_muj <- modelo_muj[,-3]
+
+names(modelo_muj) <- c("Parámetro", "Valor estimado", "Valor Z", "P-valor", "Límite inferior", "Límite superior")
+
+modelo_muj <- flextable(modelo_muj)
+
+autofit(modelo_muj)
+
+```
+
+> `lapply` opera sobre las columnas de un data.frame pero nos devuelve una lista.
+
+## Modelo conjunto
+
+```{r}
+modelo_3 <- lm(formula = ingresos ~ sexo + h_trabajo + nivel_inst + a_trabajo + edad + h_trabajo,data = enemdu)
+
+#modelo_3
+
+summary(modelo_3)
+
+source("funcion_aux.R")
+funcion_auxiliar(modelo_3)
+```
+
+En base a los modelos estimados se evidencia que existe una brecha salarial entre hombres y mujeres Una de las categorías donde la brecha resulta más notoria es por nivel educacional. Una mujer con posgrado gana en promedio 913,22 dólares al mes, mientras que los hombres con igual nivel de estudios tienen un ingreso de 1195,14 dólares. Esto significa que si un hombre decide realizar un posgrado podría casi duplicar su salario respecto del que ganaría con educación universitaria, esta realidad difiere cuando se trata de las mujeres pues, el continuar sus estudios a un post grado hace que su salario aumente pero en menor proporción que los hombres @JimePino.
+
+# Bibliografía
+
+::: {#refs}
+:::
