@@ -6,12 +6,14 @@ En la clase del sábado 4 de junio de 2022 revisaremos:
 
 
 EPISODIO 1: Explorando las herramientas de trabajo
-1.	De que se trata este curso
+1.	De que se trata este 
+
   a.	De que no se trata este curso
   b.	Inspiración de este curso
   c.	Principio de reproducibilidad
   d.	Aún más lejos
   e.	Principio de “tidy data”
+  
 2.	Primeros pasos
   a.	Atajos de teclado de RStudio
   b.	Comentarios
